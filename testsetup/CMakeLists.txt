@@ -52,7 +52,7 @@ while(TEST_INDEX LESS TEST_COUNT)
     set(_current_test_targets ${TEST_${TEST_INDEX}_TARGETS})
     set(_current_test_expected_results ${TEST_${TEST_INDEX}_EXPECTED_RESULTS})
 
-    acquire_test(${_current_test_name} ${TEST_BASE_DIR}/${TEST_${TEST_INDEX}_NAME} ${TEST_${TEST_INDEX}_URL} ${TEST_${TEST_INDEX}_BRANCH})
+    acquire_test(${_current_test_name} ${TEST_BASE_DIR}/${_current_test_name} ${_current_test_url} ${_current_test_branch})
 
     list(LENGTH ${_current_test_targets} TARGET_COUNT)
     if (TARGET_COUNT EQUAL 0)
