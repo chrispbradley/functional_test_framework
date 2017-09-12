@@ -21,10 +21,10 @@ This framework currently supports a single standard of test database.  In the fu
 
 The database must consist of individual files and no directories. Each file that defines a functional test must have the suffix '.cmake'. Each file must contain valid text that can be 'included' by CMake.  Each file must define four variables:
 
-  #. TEST_URL
-  #. TEST_BRANCH
-  #. TEST_TARGETS
-  #. TEST_EXPECTED_RESULTS 
+#. TEST_URL
+#. TEST_BRANCH
+#. TEST_TARGETS
+#. TEST_EXPECTED_RESULTS 
 
 The *TEST_URL* variable must specify the location of a git repository.  The *TEST_BRANCH* variable must specify a branch within the repository specified by *TEST_URL*.  The *TEST_TARGETS* variable must specify the name of the executable to test.  The name of the executable must be a target as CMake understands targets.  The *TEST_TARGETS*  variable may be specified as a list of executable names.  The *TEST_EXPECTED_RESULTS* variable must specify the location of the expected results relative to the root of the repository.  The *TEST_EXPECTED_RESULTS* may be specified as a list of expected results locations.  The number of entries in the *TEST_EXPECTED_RESULTS* variable must match the number of entries in the *TEST_TARGETS* variable.  The entries in the *TEST_EXPECTED_RESULTS* variable may be either a location of a single file or a single directory.  In the case where an entry in the *TEST_EXPECTED_RESULTS* variable specifies  a directory every file found in that directory will be tested against the files output by the target executable specified in the corresponding entry in the *TEST_TARGETS* variable.
 
