@@ -48,4 +48,4 @@ Framework configuration
 
 The framework must be configured with *OpenCMISSLibs_DIR* set to the location of an OpenCMISS libraries installation install directory.
 
-You can also optionally set the location of the test database with the ** variable.  This can be passed in through the command line or set using a CMake-GUI application.
+You can also optionally set the location of the test database with the *TEST_DB_REPO_URL* variable and also set the branch from the test database repository with the *TEST_DB_REPO_BRANCH* variable.  These variables can be passed in through the command line or set using a CMake-GUI application.
