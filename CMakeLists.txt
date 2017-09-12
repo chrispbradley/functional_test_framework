@@ -2,24 +2,28 @@
 cmake_minimum_required(VERSION 3.4 FATAL_ERROR)
 project(OpenCMISS-FunctionalTests VERSION 1.0 LANGUAGES C CXX)
 
-if (DEFINED BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE ${BUILD_TYPE} CACHE STRING "Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel." FORCE)
-endif ()
+# Default values for test database.
+set(TEST_DB_GIT_BASE https://github.com)
+set(TEST_DB_ORG hsorby)
+set(TEST_DB_REPO_NAME FunctionalTests-Database)
 
-
-include(ExternalProject)
-
-set(BASE_GIT https://github.com)
-
+# Default values for ndiff.
+set(NDIFF_GIT_BASE https://github.com)
 set(NDIFF_ORG OpenCMISS-Dependencies)
 set(NDIFF_REPO_NAME ndiff)
 set(NDIFF_REPO_BRANCH v2.0.0)
 
-set(TEST_DB_ORG hsorby)
-set(TEST_DB_REPO_NAME FunctionalTests-Database)
-set(TEST_DB_REPO_BRANCH master)
+if (DEFINED BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE ${BUILD_TYPE} CACHE STRING "Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel." FORCE)
+else ()
+    set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel." FORCE)
+endif ()
 
-# Basic test for multi-configuration capable environments
+set(OpenCMISSLibs_DIR ${OpenCMISSLibs_DIR} CACHE PATH "Install prefix for OpenCMISS libraries.")
+set(TEST_DB_REPO_URL ${TEST_DB_GIT_BASE}/${TEST_DB_ORG}/${TEST_DB_REPO_NAME} CACHE STRING "User specified test database url.")
+set(TEST_DB_REPO_BRANCH master CACHE STRING "Branch of the database git repository to use.")
+
+# Basic test for multi-configuration capable environments.
 if (MSVC OR XCODE)
     set(_MULTI_CONFIG_ENV TRUE)
 else ()
@@ -34,9 +38,11 @@ else ()
 endif ()
 
 # Get ndiff installed.
-set(NDIFF_GITHUB_REPO_URL ${BASE_GIT}/${NDIFF_ORG}/${NDIFF_REPO_NAME})
+set(NDIFF_GITHUB_REPO_URL ${NDIFF_GIT_BASE}/${NDIFF_ORG}/${NDIFF_REPO_NAME})
 set(NDIFF_GITHUB_BRANCH ${NDIFF_REPO_BRANCH})
 set(NDIFF_CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=.)
+
+include(ExternalProject)
 
 ExternalProject_Add(ndiff
     PREFIX ndiff
@@ -52,14 +58,10 @@ ExternalProject_Add(ndiff
     INSTALL_COMMAND ${CMAKE_COMMAND} --build . --target install ${MULTICONFIG_BUILD_CONFIG}
 )
 
-# Get database of examples.
-set(TEST_DB_GITHUB_REPO_URL ${BASE_GIT}/${TEST_DB_ORG}/${TEST_DB_REPO_NAME})
-set(TEST_DB_GITHUB_BRANCH ${TEST_DB_REPO_BRANCH})
-
 ExternalProject_Add(test_db
     SOURCE_DIR test_db/
-    GIT_REPOSITORY ${TEST_DB_GITHUB_REPO_URL}
-    GIT_TAG ${TEST_DB_GITHUB_BRANCH}
+    GIT_REPOSITORY ${TEST_DB_REPO_URL}
+    GIT_TAG ${TEST_DB_REPO_BRANCH}
     CONFIGURE_COMMAND ""
     BUILD_COMMAND ""
     INSTALL_COMMAND ""
@@ -89,3 +91,5 @@ add_custom_target(run_tests ALL
     COMMAND ${CMAKE_CTEST_COMMAND}
     DEPENDS build_tests
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/testrunner-build)
+
+mark_as_advanced(CMAKE_OSX_ARCHITECTURES CMAKE_OSX_DEPLOYMENT_TARGET CMAKE_OSX_SYSROOT CMAKE_INSTALL_PREFIX)
