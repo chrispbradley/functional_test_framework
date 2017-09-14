@@ -12,8 +12,8 @@ if (NOT test_output)
     message( FATAL_ERROR "Variable test_output not defined" )
 endif ()
 
-set(_NDIFF_COUNT 0)
 if (IS_DIRECTORY "${expected_output}")
+    set(_NDIFF_COUNT 0)
     # Assume all files inside expected output directory are to be compared.
     file(GLOB expected_files LIST_DIRECTORIES FALSE ${expected_output}/*)
     foreach(_file ${expected_files})
@@ -22,6 +22,7 @@ if (IS_DIRECTORY "${expected_output}")
         set(NDIFF_COMPARISON_${_NDIFF_COUNT} COMMAND ${NDIFF_EXECUTABLE} ${_file} ${test_output}/${_output_file})
     endforeach()
 else ()
+    set(_NDIFF_COUNT 1)
     set(NDIFF_COMPARISON_1 COMMAND ${NDIFF_EXECUTABLE} ${expected_output} ${test_output})
 endif ()
 

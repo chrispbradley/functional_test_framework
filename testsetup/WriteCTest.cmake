@@ -2,6 +2,7 @@
 macro(write_ctest TEST_NAME TEST_TARGET TEST_EXPECTED_RESULTS _OUTPUT)
 
     set(_TMP_OUTPUT "
+
 # Create output directory
 file(MAKE_DIRECTORY \${CMAKE_BINARY_DIR}/test_runs/${TEST_NAME})
 
