@@ -13,7 +13,7 @@ set(TEST_DB "${CMAKE_CURRENT_BINARY_DIR}/test_db/" CACHE PATH "Set the test data
 
 # Default values for ndiff.
 set(NDIFF_GIT_BASE https://github.com)
-set(NDIFF_ORG OpenCMISS-Dependencies)
+set(NDIFF_ORG OpenCMISS-Utilities)
 set(NDIFF_REPO_NAME ndiff)
 set(NDIFF_REPO_BRANCH v2.0.0)
 
