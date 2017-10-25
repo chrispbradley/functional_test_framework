@@ -19,7 +19,7 @@ OpenCMISS test database standard
 
 This framework currently supports a single standard of test database.  In the future we would like to extend this to be able to handle an RDF annotated test database that is compatible with PMR.
 
-The database must consist of individual files and no directories. Each file that defines a functional test must have the suffix '.cmake'. Each file must contain valid text that can be 'included' by CMake.  Each file must define four variables:
+The database must consist of individual test description files or be a single test description file. Each test description file that defines a functional test must have the suffix '.cmake'. Each test description file must contain valid text that can be 'included' by CMake.  Each file must define four variables:
 
 #. TEST_URL
 #. TEST_BRANCH
@@ -33,15 +33,17 @@ How to use
 
 To use the framework execute the following commands from a terminal application (Windows users will have to determine the equivalent commands as an exercise)::
 
-  git clone https://github.com/hsorby/OpenCMISS-FunctionalTests.git functional_tests
-  mkdir functional_tests-build
-  cd functional_tests-build
-  cmake -DOpenCMISSLibs_DIR=/location/where/opencmiss/libraries/are/installed ../functional_tests
+  git clone https://github.com/OpenCMISS/functional_test_framework.git functional_test_framework
+  mkdir functional_test_framework-build
+  cd functional_test_framework-build
+  cmake -DOpenCMISSLibs_DIR=/location/where/opencmiss/libraries/are/installed ../functional_test_framework
   make
 
-.. note:: The current location of the framework is not intended as it's permanent home.
-
 .. note:: The OpenCMISSLibs_DIR should be set with a value which is an actual directory accessible from your machine where the OpenCMISS libraries have been installed.
+
+This will configure, build, and run the test(s) defined by the test database.  You can run just the tests (once the intial configure, build, and run has successfully completed) with the `ctest` command::
+
+   ctest
 
 Framework configuration
 =======================
@@ -49,3 +51,15 @@ Framework configuration
 The framework must be configured with *OpenCMISSLibs_DIR* set to the location of an OpenCMISS libraries installation install directory.
 
 You can also optionally set the location of the test database with the *TEST_DB_REPO_URL* variable and also set the branch from the test database repository with the *TEST_DB_REPO_BRANCH* variable.  These variables can be passed in through the command line or set using a CMake-GUI application.
+
+Further you can set the location of the test database to use using the *TEST_DB* variable.  The test database may either point directly to a test description file as defined above or a directory containing test description files.
+
+Test description file
+=====================
+
+Below is an example of a test description file that meets the requirements of the test framework::
+
+   set(TEST_URL https://github.com/OpenCMISS-Examples/burgers_static.git)
+   set(TEST_BRANCH develop)
+   set(TEST_TARGETS burgers_static_fortran)
+   set(TEST_EXPECTED_RESULTS expected_results.txt)
