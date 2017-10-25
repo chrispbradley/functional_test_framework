@@ -30,7 +30,11 @@ include(WriteCTest)
 
 file(COPY run_test.cmake DESTINATION ${TEST_BASE_DIR})
 
-read_test_db()
+if (IS_DIRECTORY "${TEST_DB}")
+    read_test_db_dir()
+else ()
+    read_test_db_file()
+endif ()
 
 set(_run "
 cmake_minimum_required(VERSION 3.4 FATAL_ERROR)

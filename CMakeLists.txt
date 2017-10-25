@@ -6,6 +6,10 @@ project(OpenCMISS-FunctionalTests VERSION 1.0 LANGUAGES C CXX)
 set(TEST_DB_GIT_BASE https://github.com)
 set(TEST_DB_ORG hsorby)
 set(TEST_DB_REPO_NAME FunctionalTests-Database)
+set(TEST_DB_REPO_URL ${TEST_DB_GIT_BASE}/${TEST_DB_ORG}/${TEST_DB_REPO_NAME} CACHE STRING "User specified test database url.")
+set(TEST_DB_REPO_BRANCH master CACHE STRING "Branch of the database git repository to use.")
+
+set(TEST_DB "${CMAKE_CURRENT_BINARY_DIR}/test_db/" CACHE PATH "Set the test database.")
 
 # Default values for ndiff.
 set(NDIFF_GIT_BASE https://github.com)
@@ -16,12 +20,11 @@ set(NDIFF_REPO_BRANCH v2.0.0)
 if (DEFINED BUILD_TYPE)
     set(CMAKE_BUILD_TYPE ${BUILD_TYPE} CACHE STRING "Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel." FORCE)
 else ()
-    set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel." FORCE)
+    set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel.")
 endif ()
 
-set(OpenCMISSLibs_DIR ${OpenCMISSLibs_DIR} CACHE PATH "Install prefix for OpenCMISS libraries.")
-set(TEST_DB_REPO_URL ${TEST_DB_GIT_BASE}/${TEST_DB_ORG}/${TEST_DB_REPO_NAME} CACHE STRING "User specified test database url.")
-set(TEST_DB_REPO_BRANCH master CACHE STRING "Branch of the database git repository to use.")
+find_package(OpenCMISSLibs REQUIRED)
+#set(OpenCMISSLibs_DIR ${OpenCMISSLibs_DIR} CACHE PATH "Install prefix for OpenCMISS libraries.")
 
 # Basic test for multi-configuration capable environments.
 if (MSVC OR XCODE)
@@ -38,8 +41,7 @@ else ()
 endif ()
 
 # Get ndiff installed.
-set(NDIFF_GITHUB_REPO_URL ${NDIFF_GIT_BASE}/${NDIFF_ORG}/${NDIFF_REPO_NAME})
-set(NDIFF_GITHUB_BRANCH ${NDIFF_REPO_BRANCH})
+set(NDIFF_REPO_URL ${NDIFF_GIT_BASE}/${NDIFF_ORG}/${NDIFF_REPO_NAME})
 set(NDIFF_CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=.)
 
 include(ExternalProject)
@@ -50,8 +52,8 @@ ExternalProject_Add(ndiff
     TMP_DIR ndiff/tmp
     SOURCE_DIR ndiff/src
     BINARY_DIR ndiff/build
-    GIT_REPOSITORY ${NDIFF_GITHUB_REPO_URL}
-    GIT_TAG ${NDIFF_GITHUB_BRANCH}
+    GIT_REPOSITORY ${NDIFF_REPO_URL}
+    GIT_TAG ${NDIFF_REPO_BRANCH}
     CMAKE_COMMAND ${CMAKE_COMMAND}
     CMAKE_ARGS ${SINGLE_BUILD_CONFIG} ${NDIFF_CMAKE_ARGS}
     BUILD_COMMAND ""
@@ -69,11 +71,12 @@ ExternalProject_Add(test_db
 
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/testsetup-build)
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/testrunner-build)
+file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/CTestTestFile.cmake" "# Generated test configuration file.\r\nsubdirs(\"testrunner-build\")\r\n")
 
 add_custom_target(setup_tests
     COMMAND ${CMAKE_COMMAND}
         -DOpenCMISSLibs_DIR=${OpenCMISSLibs_DIR}
-        -DDB_DIR=${CMAKE_CURRENT_BINARY_DIR}/test_db/
+        -DTEST_DB=${TEST_DB}
         -DNDIFF_EXECUTABLE=${CMAKE_CURRENT_BINARY_DIR}/ndiff/build/bin/ndiff
         -DTEST_BASE_DIR=${CMAKE_CURRENT_BINARY_DIR}/tests
         ${CMAKE_CURRENT_SOURCE_DIR}/testsetup
@@ -90,6 +93,14 @@ add_custom_target(build_tests
 add_custom_target(run_tests ALL
     COMMAND ${CMAKE_CTEST_COMMAND}
     DEPENDS build_tests
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/testrunner-build)
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
-mark_as_advanced(CMAKE_OSX_ARCHITECTURES CMAKE_OSX_DEPLOYMENT_TARGET CMAKE_OSX_SYSROOT CMAKE_INSTALL_PREFIX)
+set(ADVANCED_GUI_ENTRIES)
+list(APPEND ADVANCED_GUI_ENTRIES BLAS_DIR BZip2_DIR CELLML_DIR CSim_DIR Clang_DIR FIELDML-API_DIR FTGL_DIR Fieldml-API_DIR)
+list(APPEND ADVANCED_GUI_ENTRIES Freetype_DIR GDCM-ABI_DIR GLEW_DIR HYPRE_DIR IRON_DIR ITK_DIR ImageMagick_DIR)
+list(APPEND ADVANCED_GUI_ENTRIES LIBCELLML_DIR LLVM_DIR LibCellML_DIR LibXml2_DIR METIS_DIR MUMPS_DIR NETGEN_DIR)
+list(APPEND ADVANCED_GUI_ENTRIES OPTPP_DIR PARMETIS_DIR PASTIX_DIR PETSC_DIR PNG_DIR PTSCOTCH_DIR SCALAPACK_DIR)
+list(APPEND ADVANCED_GUI_ENTRIES SUITESPARSE_DIR SUNDIALS_DIR SUPERLU_DIR SUPERLU_DIST_DIR TIFF_DIR ZINC_DIR ZLIB_DIR)
+list(APPEND ADVANCED_GUI_ENTRIES QT_QMAKE_EXECUTABLE CMAKE_OSX_ARCHITECTURES CMAKE_OSX_DEPLOYMENT_TARGET CMAKE_OSX_SYSROOT)
+list(APPEND ADVANCED_GUI_ENTRIES CMAKE_CODEBLOCKS_MAKE_ARGUMENT CMAKE_CODEBLOCKS_EXECUTABLE CMAKE_INSTALL_PREFIX)
+mark_as_advanced(${ADVANCED_GUI_ENTRIES})
