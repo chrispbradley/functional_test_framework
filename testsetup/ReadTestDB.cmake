@@ -9,7 +9,7 @@ macro(read_test_db_dir)
         #message(STATUS "test_file: ${test_file}")
         get_filename_component(test_file "${test_file}" NAME)
         get_filename_component(TEST_NAME "${test_file}" NAME_WE)
-        add_functional_test(${DB_DIR}/${test_file})
+        add_functional_test(${TEST_DB}/${test_file})
     endforeach()
 endmacro()
 
