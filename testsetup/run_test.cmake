@@ -43,14 +43,13 @@ else ()
           OUTPUT_VARIABLE _OUTPUT
           ERROR_VARIABLE _ERROR)
         
-        if( test_not_successful )
-            list(GET NDIFF_COMPARISON_${_NDIFF_COUNT} 2 _expected_file)
-            list(GET NDIFF_COMPARISON_${_NDIFF_COUNT} 3 _actual_file)
+        if (test_not_successful)
+            list(GET NDIFF_COMPARISON_${_NDIFF_INDEX} 4 _expected_file)
+            list(GET NDIFF_COMPARISON_${_NDIFF_INDEX} 5 _actual_file)
             message(SEND_ERROR "Expected output: '${_expected_file}' does not match actual output '${_actual_file}'!")
-        endif( test_not_successful )
+        endif ()
         
         if (_ERROR)
-            get_filename_component(_test_name ${test_cmd} NAME)
             message(SEND_ERROR "Test '${TEST_NAME}' reported error: ${_ERROR}")
         endif ()
     endwhile()
