@@ -63,7 +63,7 @@ while(TEST_INDEX LESS TEST_COUNT)
     else ()
         acquire_test(${_current_test_name} ${TESTS_BASE_DIR}/${_current_test_name} ${_current_test_url} ${_current_test_branch})
         list(APPEND _run "add_subdirectory(${_current_test_name})\n")
-        set(_current_test_root ${TESTS_BASE_DIR})
+        set(_current_test_root ${TESTS_BASE_DIR}/${_current_test_name})
     endif ()
 
 
