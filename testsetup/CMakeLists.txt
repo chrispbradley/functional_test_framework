@@ -2,7 +2,7 @@
 # This project requires:
 #  - NDIFF_EXECUTABLE: ndiff executable.
 #  - DB_DIR: Database location that can be read with read_test_db.
-#  - TEST_BASE_DIR: Test base directory where the tests live.
+#  - TESTS_BASE_DIR: Base directory where the examples to be tested are downloaded to.
 #  - OpenCMISSLibs_DIR: A directory where opencmisslibs.config exists.
 
 cmake_minimum_required(VERSION 3.4 FATAL_ERROR)
@@ -28,7 +28,7 @@ include(ReadTestDB)
 include(AcquireTest)
 include(WriteTest)
 
-file(COPY run_test.cmake DESTINATION ${TEST_BASE_DIR})
+file(COPY run_test.cmake DESTINATION ${TESTS_BASE_DIR})
 
 if (IS_DIRECTORY "${TEST_DB}")
     read_test_db_dir()
@@ -50,19 +50,26 @@ set(TEST_INDEX 0)
 while(TEST_INDEX LESS TEST_COUNT)
     math(EXPR TEST_INDEX "${TEST_INDEX}+1")
 
-    list(APPEND _run "add_subdirectory(${TEST_${TEST_INDEX}_NAME})\n")
-
     set(_current_test_name ${TEST_${TEST_INDEX}_NAME})
     set(_current_test_url ${TEST_${TEST_INDEX}_URL})
     set(_current_test_branch ${TEST_${TEST_INDEX}_BRANCH})
     set(_current_test_targets ${TEST_${TEST_INDEX}_TARGETS})
     set(_current_test_expected_results ${TEST_${TEST_INDEX}_EXPECTED_RESULTS})
+    set(_current_test_tolerance ${TEST_${TEST_INDEX}_TOLERANCE})
 
-    acquire_test(${_current_test_name} ${TEST_BASE_DIR}/${_current_test_name} ${_current_test_url} ${_current_test_branch})
+    if (IS_ABSOLUTE "${_current_test_url}" AND EXISTS "${_current_test_url}/CMakeLists.txt")
+        set(_current_test_root ${_current_test_url})
+        list(APPEND _run "add_subdirectory(${_current_test_url} ${_current_test_name})\n")
+    else ()
+        acquire_test(${_current_test_name} ${TESTS_BASE_DIR}/${_current_test_name} ${_current_test_url} ${_current_test_branch})
+        list(APPEND _run "add_subdirectory(${_current_test_name})\n")
+        set(_current_test_root ${TESTS_BASE_DIR})
+    endif ()
+
 
     list(LENGTH ${_current_test_targets} TARGET_COUNT)
     if (TARGET_COUNT EQUAL 0)
-        write_target_test(${_current_test_name} ${_current_test_targets} ${_current_test_expected_results} _ctest_code)
+        write_target_test(${_current_test_name} ${_current_test_targets} ${_current_test_root} ${_current_test_expected_results} ${_current_test_tolerance} _ctest_code)
         list(APPEND _run ${_ctest_code})
     else ()
         set(TARGET_INDEX 0)
@@ -70,7 +77,7 @@ while(TEST_INDEX LESS TEST_COUNT)
             list(GET ${_current_test_targets} ${TARGET_INDEX} _cur_target)
             list(GET ${_current_test_expected_results} ${TARGET_INDEX} _cur_expected_result)
             math(EXPR TARGET_INDEX "${TARGET_INDEX}+1")
-            write_target_test(${_current_test_name}_${TARGET_INDEX} ${_cur_target} ${_cur_expected_result} _ctest_code)
+            write_target_test(${_current_test_name}_${TARGET_INDEX} ${_cur_target} ${_current_test_root}  ${_cur_expected_result} ${_current_test_tolerance} _ctest_code)
             list(APPEND _run ${_ctest_code})
         endwhile()
     endif ()
@@ -78,4 +85,4 @@ endwhile()
 
 list(APPEND _run "\n")
 
-file(WRITE ${TEST_BASE_DIR}/CMakeLists.txt ${_run})
+file(WRITE ${TESTS_BASE_DIR}/CMakeLists.txt ${_run})

@@ -1,33 +1,33 @@
 # some argument checking:
-# test_cmd is the command to run with all its arguments
-if (NOT test_cmd)
-    message( FATAL_ERROR "Variable test_cmd not defined" )
+# TEST_CMD is the command to run with all its arguments
+if (NOT TEST_CMD)
+    message( FATAL_ERROR "Variable TEST_CMD not defined" )
 endif ()
-# expected_output contains the name of the "expected" output file
-if (NOT expected_output)
-    message( FATAL_ERROR "Variable expected_output not defined" )
+# EXPECTED_OUTPUT contains the name of the "expected" output file
+if (NOT EXPECTED_OUTPUT)
+    message( FATAL_ERROR "Variable EXPECTED_OUTPUT not defined" )
 endif ()
-# test_output contains the name of the output file the test_cmd will produce
-if (NOT test_output)
-    message( FATAL_ERROR "Variable test_output not defined" )
+# TEST_OUTPUT contains the name of the output file the TEST_CMD will produce
+if (NOT TEST_OUTPUT)
+    message( FATAL_ERROR "Variable TEST_OUTPUT not defined" )
 endif ()
 
-if (IS_DIRECTORY "${expected_output}")
+if (IS_DIRECTORY "${EXPECTED_OUTPUT}")
     set(_NDIFF_COUNT 0)
     # Assume all files inside expected output directory are to be compared.
-    file(GLOB expected_files LIST_DIRECTORIES FALSE ${expected_output}/*)
+    file(GLOB expected_files LIST_DIRECTORIES FALSE ${EXPECTED_OUTPUT}/*)
     foreach(_file ${expected_files})
         math(EXPR _NDIFF_COUNT "${_NDIFF_COUNT}+1")
         get_filename_component(_output_file ${_file} NAME)
-        set(NDIFF_COMPARISON_${_NDIFF_COUNT} COMMAND ${NDIFF_EXECUTABLE} -relerr 1e-14 ${_file} ${test_output}/${_output_file})
+        set(NDIFF_COMPARISON_${_NDIFF_COUNT} COMMAND ${NDIFF_EXECUTABLE} -relerr ${TEST_TOLERANCE} ${_file} ${TEST_OUTPUT}/${_output_file})
     endforeach()
 else ()
     set(_NDIFF_COUNT 1)
-    set(NDIFF_COMPARISON_1 COMMAND ${NDIFF_EXECUTABLE} ${expected_output} ${test_output})
+    set(NDIFF_COMPARISON_1 COMMAND ${NDIFF_EXECUTABLE} ${EXPECTED_OUTPUT} ${TEST_OUTPUT})
 endif ()
 
 execute_process(
-    COMMAND ${test_cmd}
+    COMMAND ${TEST_CMD}
     RESULT_VARIABLE test_execution_not_successful
     WORKING_DIRECTORY test_runs/${TEST_NAME})
 
@@ -42,7 +42,7 @@ else ()
           RESULT_VARIABLE test_not_successful
           OUTPUT_VARIABLE _OUTPUT
           ERROR_VARIABLE _ERROR)
-        
+
         if (test_not_successful)
             list(GET NDIFF_COMPARISON_${_NDIFF_INDEX} 4 _expected_file)
             list(GET NDIFF_COMPARISON_${_NDIFF_INDEX} 5 _actual_file)

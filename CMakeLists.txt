@@ -78,7 +78,7 @@ add_custom_target(setup_tests
         -DOpenCMISSLibs_DIR=${OpenCMISSLibs_DIR}
         -DTEST_DB=${TEST_DB}
         -DNDIFF_EXECUTABLE=${CMAKE_CURRENT_BINARY_DIR}/ndiff/build/bin/ndiff
-        -DTEST_BASE_DIR=${CMAKE_CURRENT_BINARY_DIR}/tests
+        -DTESTS_BASE_DIR=${CMAKE_CURRENT_BINARY_DIR}/tests
         ${CMAKE_CURRENT_SOURCE_DIR}/testsetup
     COMMAND ${CMAKE_COMMAND} --build . ${MULTICONFIG_BUILD_CONFIG}
     DEPENDS test_db ndiff
