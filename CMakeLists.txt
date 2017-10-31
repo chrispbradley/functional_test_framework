@@ -95,6 +95,13 @@ add_custom_target(run_tests ALL
     DEPENDS build_tests
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
+add_custom_target(clear_tests
+    COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_CURRENT_BINARY_DIR}/testsetup-build
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/testsetup-build
+    COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_CURRENT_BINARY_DIR}/testrunner-build
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/testrunner-build
+    COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_CURRENT_BINARY_DIR}/tests)
+
 set(ADVANCED_GUI_ENTRIES)
 list(APPEND ADVANCED_GUI_ENTRIES BLAS_DIR BZip2_DIR CELLML_DIR CSim_DIR Clang_DIR FIELDML-API_DIR FTGL_DIR Fieldml-API_DIR)
 list(APPEND ADVANCED_GUI_ENTRIES Freetype_DIR GDCM-ABI_DIR GLEW_DIR HYPRE_DIR IRON_DIR ITK_DIR ImageMagick_DIR)
