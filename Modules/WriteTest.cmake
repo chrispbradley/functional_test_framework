@@ -13,7 +13,6 @@ function(_write_test_to_file OUTPUT_FILENAME TEST_NAME TEST_CMD TEST_ROOT TEST_E
     set(CONFIGURED_INPUTS)
     foreach(_arg ${ARGN})
         set(TEST_CMD "${TEST_CMD}|${_arg}")
-        message(STATUS "TEST_ROOT: ${TEST_ROOT}/${_arg}")
         if (EXISTS "${TEST_ROOT}/${_arg}")
             list(APPEND CONFIGURED_INPUTS "configure_file(${TEST_ROOT}/${_arg} \${CMAKE_BINARY_DIR}/test_runs/${TEST_NAME}/${_arg})")
         endif ()

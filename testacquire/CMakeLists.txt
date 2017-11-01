@@ -36,12 +36,12 @@ while(TEST_INDEX LESS TEST_COUNT)
     math(EXPR TEST_INDEX "${TEST_INDEX}+1")
 
     set(_current_test_name ${TEST_${TEST_INDEX}_NAME})
-    set(_current_test_url ${TEST_${TEST_INDEX}_URL})
+    set(_current_test_git_repo ${TEST_${TEST_INDEX}_GIT_REPO})
     set(_current_test_branch ${TEST_${TEST_INDEX}_BRANCH})
 
-    if (IS_ABSOLUTE "${_current_test_url}" AND EXISTS "${_current_test_url}/CMakeLists.txt")
+    if (IS_ABSOLUTE "${_current_test_git_repo}" AND EXISTS "${_current_test_git_repo}/CMakeLists.txt")
         # Local test already acquired so do nothing
     else ()
-        acquire_test(${_current_test_name} ${TESTS_BASE_DIR}/${_current_test_name} ${_current_test_url} ${_current_test_branch})
+        acquire_test(${_current_test_name} ${TESTS_BASE_DIR}/${_current_test_name} ${_current_test_git_repo} ${_current_test_branch})
     endif ()
 endwhile()
