@@ -28,6 +28,14 @@ include(ReadTestDB)
 include(AcquireTest)
 include(WriteTest)
 
+set(_MPIEXEC_NAMES mpiexec mpirun lamexec srun)
+# Most mpi distros have some form of mpiexec which gives us something we can reliably look for.
+find_program(MPIEXEC
+  NAMES ${_MPIEXEC_NAMES}
+#  PATHS ${_MPI_PREFIX_PATH}
+  PATH_SUFFIXES bin
+  DOC "Executable for running MPI programs.")
+
 file(COPY run_test.cmake DESTINATION ${TESTS_BASE_DIR})
 
 if (IS_DIRECTORY "${TEST_DB}")
@@ -58,6 +66,10 @@ while(TEST_INDEX LESS TEST_COUNT)
     set(_current_test_expected_results ${TEST_${TEST_INDEX}_EXPECTED_RESULTS})
     set(_current_test_tolerance ${TEST_${TEST_INDEX}_TOLERANCE})
     set(_current_test_args ${TEST_${TEST_INDEX}_TARGETS_ARGS})
+    set(_current_test_mp ${TEST_${TEST_INDEX}_MULTI_PROCESS})
+    if (_current_test_mp)
+        set(_current_test_np ${TEST_${TEST_INDEX}_NP})
+    endif ()
 
     if (IS_ABSOLUTE "${_current_test_url}" AND EXISTS "${_current_test_url}/CMakeLists.txt")
         set(_current_test_root ${_current_test_url})
@@ -68,21 +80,32 @@ while(TEST_INDEX LESS TEST_COUNT)
         set(_current_test_root ${TESTS_BASE_DIR}/${_current_test_name})
     endif ()
 
-
     list(LENGTH ${_current_test_targets} TARGET_COUNT)
     if (TARGET_COUNT EQUAL 0)
-        write_target_test(${SETUP_CMAKELISTS_FILE} ${_current_test_name}
-            ${_current_test_targets} ${_current_test_root} ${_current_test_expected_results}
-            ${_current_test_tolerance} ${_current_test_args})
+        if (_current_test_mp)
+            write_mp_target_test(${SETUP_CMAKELISTS_FILE} ${_current_test_name}
+                ${_current_test_targets} ${_current_test_np} ${_current_test_root} ${_current_test_expected_results}
+                ${_current_test_tolerance} ${_current_test_args})
+        else ()
+            write_target_test(${SETUP_CMAKELISTS_FILE} ${_current_test_name}
+                ${_current_test_targets} ${_current_test_root} ${_current_test_expected_results}
+                ${_current_test_tolerance} ${_current_test_args})
+        endif ()
     else ()
         set(TARGET_INDEX 0)
         while(TARGET_INDEX LESS TARGET_COUNT)
             list(GET ${_current_test_targets} ${TARGET_INDEX} _cur_target)
             list(GET ${_current_test_expected_results} ${TARGET_INDEX} _cur_expected_result)
             math(EXPR TARGET_INDEX "${TARGET_INDEX}+1")
-            write_target_test(${SETUP_CMAKELISTS_FILE} ${_current_test_name}_${TARGET_INDEX}
-                ${_cur_target} ${_current_test_root} ${_cur_expected_result}
-                ${_current_test_tolerance} ${_current_test_args})
+            if (_current_test_mp)
+                write_mp_target_test(${SETUP_CMAKELISTS_FILE} ${_current_test_name}_${TARGET_INDEX}
+                    ${_cur_target} ${_current_test_np} ${_current_test_root} ${_cur_expected_result}
+                    ${_current_test_tolerance} ${_current_test_args})
+            else ()
+                write_target_test(${SETUP_CMAKELISTS_FILE} ${_current_test_name}_${TARGET_INDEX}
+                    ${_cur_target} ${_current_test_root} ${_cur_expected_result}
+                    ${_current_test_tolerance} ${_current_test_args})
+            endif ()
         endwhile()
     endif ()
 endwhile()

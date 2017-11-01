@@ -23,8 +23,8 @@ else ()
     set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel.")
 endif ()
 
-find_package(OpenCMISSLibs REQUIRED)
-#set(OpenCMISSLibs_DIR ${OpenCMISSLibs_DIR} CACHE PATH "Install prefix for OpenCMISS libraries.")
+#find_package(OpenCMISSLibs REQUIRED)
+set(OpenCMISSLibs_DIR ${OpenCMISSLibs_DIR} CACHE PATH "Install prefix for OpenCMISS libraries.")
 
 # Basic test for multi-configuration capable environments.
 if (MSVC OR XCODE)

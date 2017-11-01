@@ -38,8 +38,12 @@ execute_process(
     WORKING_DIRECTORY test_runs/${TEST_NAME})
 
 if (test_execution_not_successful)
-    message(SEND_ERROR "${TEST_NAME} did not execute succesfully!")
+    message(STATUS "test_execution_not_successful: ${test_execution_not_successful}")
+    message(STATUS "_out: ${_out}")
+    message(SEND_ERROR "${TEST_NAME} did not execute succesfully!\n${TEST_CMD}")
 elseif (_NDIFF_COUNT EQUAL 0 OR NOT EXPECTED_OUTPUT_FOUND)
+    message(STATUS "test_execution_not_successful: ${test_execution_not_successful}")
+    message(STATUS "_out: ${_out}")
     message(SEND_ERROR "${TEST_NAME} does not have expected output!")
 else ()
     set(_NDIFF_INDEX 0)
