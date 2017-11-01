@@ -69,9 +69,15 @@ ExternalProject_Add(test_db
     INSTALL_COMMAND ""
 )
 
-file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/testsetup-build)
-file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/testrunner-build)
-file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/CTestTestFile.cmake" "# Generated test configuration file.\r\nsubdirs(\"testrunner-build\")\r\n")
+if (NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/testsetup-build")
+    file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/testsetup-build)
+endif ()
+if (NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/testrunner-build")
+    file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/testrunner-build)
+endif ()
+if (NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/CTestTestFile.cmake")
+    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/CTestTestFile.cmake" "# Generated test configuration file.\r\nsubdirs(\"testrunner-build\")\r\n")
+endif ()
 
 add_custom_target(setup_tests
     COMMAND ${CMAKE_COMMAND}
