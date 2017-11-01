@@ -36,7 +36,8 @@ else ()
     read_test_db_file()
 endif ()
 
-set(_run "
+set(SETUP_CMAKELISTS_FILE ${TESTS_BASE_DIR}/CMakeLists.txt)
+file(WRITE ${SETUP_CMAKELISTS_FILE} "
 cmake_minimum_required(VERSION 3.4 FATAL_ERROR)
 project(testrunner VERSION 1.0 LANGUAGES C CXX Fortran)
 enable_testing()
@@ -56,33 +57,34 @@ while(TEST_INDEX LESS TEST_COUNT)
     set(_current_test_targets ${TEST_${TEST_INDEX}_TARGETS})
     set(_current_test_expected_results ${TEST_${TEST_INDEX}_EXPECTED_RESULTS})
     set(_current_test_tolerance ${TEST_${TEST_INDEX}_TOLERANCE})
+    set(_current_test_args ${TEST_${TEST_INDEX}_TARGETS_ARGS})
 
     if (IS_ABSOLUTE "${_current_test_url}" AND EXISTS "${_current_test_url}/CMakeLists.txt")
         set(_current_test_root ${_current_test_url})
-        list(APPEND _run "add_subdirectory(${_current_test_url} ${_current_test_name})\n")
+        file(APPEND ${SETUP_CMAKELISTS_FILE} "add_subdirectory(${_current_test_url} ${_current_test_name})\n")
     else ()
         acquire_test(${_current_test_name} ${TESTS_BASE_DIR}/${_current_test_name} ${_current_test_url} ${_current_test_branch})
-        list(APPEND _run "add_subdirectory(${_current_test_name})\n")
+        file(APPEND ${SETUP_CMAKELISTS_FILE} "add_subdirectory(${_current_test_name})\n")
         set(_current_test_root ${TESTS_BASE_DIR}/${_current_test_name})
     endif ()
 
 
     list(LENGTH ${_current_test_targets} TARGET_COUNT)
     if (TARGET_COUNT EQUAL 0)
-        write_target_test(${_current_test_name} ${_current_test_targets} ${_current_test_root} ${_current_test_expected_results} ${_current_test_tolerance} _ctest_code)
-        list(APPEND _run ${_ctest_code})
+        write_target_test(${SETUP_CMAKELISTS_FILE} ${_current_test_name}
+            ${_current_test_targets} ${_current_test_root} ${_current_test_expected_results}
+            ${_current_test_tolerance} ${_current_test_args})
     else ()
         set(TARGET_INDEX 0)
         while(TARGET_INDEX LESS TARGET_COUNT)
             list(GET ${_current_test_targets} ${TARGET_INDEX} _cur_target)
             list(GET ${_current_test_expected_results} ${TARGET_INDEX} _cur_expected_result)
             math(EXPR TARGET_INDEX "${TARGET_INDEX}+1")
-            write_target_test(${_current_test_name}_${TARGET_INDEX} ${_cur_target} ${_current_test_root}  ${_cur_expected_result} ${_current_test_tolerance} _ctest_code)
-            list(APPEND _run ${_ctest_code})
+            write_target_test(${SETUP_CMAKELISTS_FILE} ${_current_test_name}_${TARGET_INDEX}
+                ${_cur_target} ${_current_test_root} ${_cur_expected_result}
+                ${_current_test_tolerance} ${_current_test_args})
         endwhile()
     endif ()
 endwhile()
 
-list(APPEND _run "\n")
-
-file(WRITE ${TESTS_BASE_DIR}/CMakeLists.txt ${_run})
+file(APPEND ${SETUP_CMAKELISTS_FILE} "\n")

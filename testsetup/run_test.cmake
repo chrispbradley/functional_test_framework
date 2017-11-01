@@ -29,9 +29,12 @@ else ()
     set(EXPECTED_OUTPUT_FOUND FALSE)
 endif ()
 
+string(REPLACE "|" ";" TEST_CMD ${TEST_CMD})
 execute_process(
     COMMAND ${TEST_CMD}
     RESULT_VARIABLE test_execution_not_successful
+    OUTPUT_VARIABLE _out
+    ERROR_VARIABLE _out
     WORKING_DIRECTORY test_runs/${TEST_NAME})
 
 if (test_execution_not_successful)
