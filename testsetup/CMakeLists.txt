@@ -8,8 +8,6 @@
 cmake_minimum_required(VERSION 3.4 FATAL_ERROR)
 project(testsetup VERSION 1.0 LANGUAGES C CXX)
 
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR})
-
 # Basic test for multi-configuration capable environments
 if (MSVC OR XCODE)
     set(_MULTI_CONFIG_ENV TRUE)
@@ -25,7 +23,6 @@ else ()
 endif ()
 
 include(ReadTestDB)
-include(AcquireTest)
 include(WriteTest)
 
 set(_MPIEXEC_NAMES mpiexec mpirun lamexec srun)
@@ -75,7 +72,6 @@ while(TEST_INDEX LESS TEST_COUNT)
         set(_current_test_root ${_current_test_url})
         file(APPEND ${SETUP_CMAKELISTS_FILE} "add_subdirectory(${_current_test_url} ${_current_test_name})\n")
     else ()
-        acquire_test(${_current_test_name} ${TESTS_BASE_DIR}/${_current_test_name} ${_current_test_url} ${_current_test_branch})
         file(APPEND ${SETUP_CMAKELISTS_FILE} "add_subdirectory(${_current_test_name})\n")
         set(_current_test_root ${TESTS_BASE_DIR}/${_current_test_name})
     endif ()

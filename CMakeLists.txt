@@ -69,6 +69,9 @@ ExternalProject_Add(test_db
     INSTALL_COMMAND ""
 )
 
+if (NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/testacquire-build")
+    file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/testacquire-build)
+endif ()
 if (NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/testsetup-build")
     file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/testsetup-build)
 endif ()
@@ -79,15 +82,26 @@ if (NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/CTestTestFile.cmake")
     file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/CTestTestFile.cmake" "# Generated test configuration file.\r\nsubdirs(\"testrunner-build\")\r\n")
 endif ()
 
+add_custom_target(acquire_tests
+    COMMAND ${CMAKE_COMMAND}
+        -DCMAKE_MODULE_PATH=${CMAKE_CURRENT_SOURCE_DIR}/Modules
+        -DTEST_DB=${TEST_DB}
+        -DTESTS_BASE_DIR=${CMAKE_CURRENT_BINARY_DIR}/tests
+        ${CMAKE_CURRENT_SOURCE_DIR}/testacquire
+    COMMAND ${CMAKE_COMMAND} --build . ${MULTICONFIG_BUILD_CONFIG}
+    DEPENDS test_db
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/testacquire-build)
+
 add_custom_target(setup_tests
     COMMAND ${CMAKE_COMMAND}
         -DOpenCMISSLibs_DIR=${OpenCMISSLibs_DIR}
+        -DCMAKE_MODULE_PATH=${CMAKE_CURRENT_SOURCE_DIR}/Modules
         -DTEST_DB=${TEST_DB}
         -DNDIFF_EXECUTABLE=${CMAKE_CURRENT_BINARY_DIR}/ndiff/build/bin/ndiff
         -DTESTS_BASE_DIR=${CMAKE_CURRENT_BINARY_DIR}/tests
         ${CMAKE_CURRENT_SOURCE_DIR}/testsetup
     COMMAND ${CMAKE_COMMAND} --build . ${MULTICONFIG_BUILD_CONFIG}
-    DEPENDS test_db ndiff
+    DEPENDS ndiff acquire_tests
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/testsetup-build)
 
 add_custom_target(build_tests
@@ -102,6 +116,8 @@ add_custom_target(run_tests ALL
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
 add_custom_target(clear_tests
+    COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_CURRENT_BINARY_DIR}/testacquire-build
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/testacquire-build
     COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_CURRENT_BINARY_DIR}/testsetup-build
     COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/testsetup-build
     COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_CURRENT_BINARY_DIR}/testrunner-build
