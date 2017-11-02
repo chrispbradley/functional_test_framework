@@ -23,7 +23,7 @@ This will configure, build, and run the test(s) defined by the test database.  Y
 Documentation
 =============
 
-The documentation has been written using reStructured text and it is available in the docs directory.  The documentation can be read directly in its' reStructured text form or it can be built using Sphinx to render the documentation in a different format.  For example, we can render the documentation as html by running the following command from the command line (for unix based operating systems)::
+The documentation has been written using reStructured text and it is available in the docs directory.  The documentation can be read directly in its' reStructured text form or it can be built using Sphinx to render the documentation in a different format.  For example, we can render the documentation as html by running the following command from the command line inside the **docs** directory (for unix based operating systems)::
 
    make html
 
