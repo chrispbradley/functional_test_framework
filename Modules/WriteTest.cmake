@@ -24,9 +24,12 @@ function(_write_test_to_file OUTPUT_FILENAME TEST_NAME TEST_CMD TEST_ROOT TEST_E
     foreach(_arg ${ARGN})
         set(TEST_CMD "${TEST_CMD}|${_arg}")
         if (EXISTS "${TEST_ROOT}/${_arg}")
-            list(APPEND CONFIGURED_INPUTS "configure_file(${TEST_ROOT}/${_arg} \${CMAKE_BINARY_DIR}/test_runs/${TEST_NAME}/${_arg})")
+            list(APPEND CONFIGURED_INPUTS "configure_file(${TEST_ROOT}/${_arg} \${CMAKE_BINARY_DIR}/test_runs/${TEST_NAME}/${_arg})\n")
         endif ()
     endforeach()
+    if (CONFIGURED_INPUTS)
+        list(REMOVE_DUPLICATES CONFIGURED_INPUTS)
+    endif ()
 
     set(_TMP_OUTPUT "
 # Create output directory
@@ -35,7 +38,7 @@ file(MAKE_DIRECTORY \${CMAKE_BINARY_DIR}/test_runs/${TEST_NAME})
 # Configure input files (if required).
 ${CONFIGURED_INPUTS}
 
-add_test(NAME test_${TEST_NAME}
+add_test(NAME ${TEST_NAME}
    COMMAND ${CMAKE_COMMAND}
    -DTEST_NAME=${TEST_NAME}
    -DNDIFF_EXECUTABLE=${NDIFF_EXECUTABLE}
