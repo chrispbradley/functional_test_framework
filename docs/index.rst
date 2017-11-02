@@ -78,11 +78,13 @@ Framework configuration
 
 The framework must be configured with *OpenCMISSLibs_DIR* set to the location of an OpenCMISS libraries installation install directory.
 
-You can also optionally set the location of the test database with the *TEST_DB_REPO_URL* variable and also set the branch from the test database repository with the *TEST_DB_REPO_BRANCH* variable.  These variables can be passed in through the command line or set using a CMake-GUI application.
+The *TEST_DB* variable defines the location of the database to use for testing.  The default database is the database retreived by the variables *TEST_DB_REPO_URL* and *TEST_DB_REPO_BRANCH*.  You can set the location of the *TEST_DB* to a local database by passing the variable in through the command line or set it using a CMake-GUI application.
 
-Further you can set the location of the test database to use using the *TEST_DB* variable.  The test database may either point directly to a test description file as defined above or a directory containing test description files.
+You can also optionally change the default test database with the *TEST_DB_REPO_URL* variable and also set the branch from the test database repository with the *TEST_DB_REPO_BRANCH* variable.  These variables can be passed in through the command line or set using a CMake-GUI application.  The *TEST_DB_REPO_URL* variable can be used to retreive any database that is accessible through Git.
 
-If the *TEST_DB* variable is defined and it is a directory or file that exists then this is the database that will be used by the framework and the database defined by the *TEST_DB_REPO_URL* will be ignored.  The *TEST_DB* variable may be used to reference a location on the local disk.  A reference to a location on the local disk must be defined as an absolute path, using a relative path will cause undefined behaviour.
+The *TEST_DB* variable may either point directly to a test description file as defined above or a directory containing test description files.
+
+If the *TEST_DB* variable is defined and it is a directory or file that exists then this is the database that will be used by the framework and the database defined by the *TEST_DB_REPO_URL* and *TEST_DB_REPO_BRANCH* variables will be ignored.  The *TEST_DB* variable may be used to reference a location on the local disk.  A reference to a location on the local disk must be defined as an absolute path, using a relative path will cause undefined behaviour.
 
 An example of configuring the framework to use a local database is given below::
 
