@@ -29,11 +29,11 @@ The *TEST_GIT_REPO* variable must specify the location of a git repository.  The
 
 Additionally you must define either a
 
-* TEST_TARGETS
+3. (a) TEST_TARGETS
 
 or a
 
-* PYTEST_TARGETS
+3. (b) PYTEST_TARGETS
 
 variable.  The *TEST_TARGETS* variable must specify the name of the executable to test.  The name of the executable must be a target as CMake understands targets.  The *TEST_TARGETS*  variable may be specified as a list of executable names.  The *PYTEST_TARGETS* variable must be specified as the name of the python script to execute.  This *PYTEST_TARGETS* variable must be defined relative to the root directory of the repository.  The *PYTEST_TARGETS* variable may be specified as a list of python scripts defined relative to the root directory of the repository.
 
@@ -84,6 +84,13 @@ Further you can set the location of the test database to use using the *TEST_DB*
 
 If the *TEST_DB* variable is defined and it is a directory or file that exists then this is the database that will be used by the framework and the database defined by the *TEST_DB_REPO_URL* will be ignored.  The *TEST_DB* variable may be used to reference a location on the local disk.  A reference to a location on the local disk must be defined as an absolute path, using a relative path will cause undefined behaviour.
 
+An example of configuring the framework to use a local database is given below::
+
+    cmake -DOpenCMISSLibs_DIR=/location/where/opencmiss/libraries/are/installed 
+      -DTEST_DB=/absoulte/path/to/test_name.cmake ../functional_test_framework
+
+Where the file *test_name.cmake* is a valid test description file according to the OpenCMISS test database standard.  In the above example only a single example *test_name* is tested.
+
 Test description examples
 =========================
 
@@ -105,10 +112,11 @@ Below is an example of a test description file that defines a Python script meet
 
 Below is an example of running a test that is on the local disk the *\*_GIT_REPO* variable is defined as an absolute path::
 
-    set(TEST_GIT_REPO /Path/to/opencmiss-software/example_framework/examples/diffusion_equation)
+    set(TEST_GIT_REPO /path/to/opencmiss-software/example_framework/examples/diffusion_equation)
     set(TEST_BRANCH develop)
     set(TEST_TARGETS diffusion_equation)
     set(TEST_EXPECTED_RESULTS src/fortran/expected_results/)
+    set(TEST_TOLERANCE 1e-12)
 
 Below is an example of several executable programs with arguments using multiple processors::
 
@@ -117,7 +125,7 @@ Below is an example of several executable programs with arguments using multiple
 
     set(TEST_TARGETS monodomain_2d_f monodomain_2d_f)
     set(TEST_TARGETS_ARGS "0.001|0.1|1|src/fortran/n98.xml" "0.01|0.05|1|src/fortran/n98.xml")
-    set(TEST_EXPECTED_RESULTS src/fortran/expected_results src/fortran/expected_results)
+    set(TEST_EXPECTED_RESULTS src/fortran/expected_results_1 src/fortran/expected_results_2)
 
     set(TEST_MULTI_PROCESS TRUE)
     set(TEST_NP 4)
