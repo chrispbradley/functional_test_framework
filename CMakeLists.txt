@@ -7,7 +7,7 @@ set(TEST_DB_GIT_BASE https://github.com)
 set(TEST_DB_ORG OpenCMISS)
 set(TEST_DB_REPO_NAME functional_test_database)
 set(TEST_DB_REPO_URL ${TEST_DB_GIT_BASE}/${TEST_DB_ORG}/${TEST_DB_REPO_NAME} CACHE STRING "User specified test database url.")
-set(TEST_DB_REPO_BRANCH master CACHE STRING "Branch of the database git repository to use.")
+set(TEST_DB_REPO_BRANCH develop CACHE STRING "Branch of the database git repository to use.")
 
 if (NOT DEFINED TEST_DB)
     set(TEST_DB "${CMAKE_CURRENT_BINARY_DIR}/test_db/")
