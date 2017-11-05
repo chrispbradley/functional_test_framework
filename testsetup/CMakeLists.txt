@@ -49,7 +49,7 @@ enable_testing()
 
 set(OpenCMISSLibs_DIR ${OpenCMISSLibs_DIR})
 
-find_package(OpenCMISSLibs 1.3.0 REQUIRED CONFIG)
+find_package(OpenCMISSLibs 1.3.0 CONFIG)
 
 ")
 set(TEST_INDEX 0)
