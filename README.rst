@@ -3,6 +3,10 @@
 OpenCMISS Functional Testing Framework
 ======================================
 
+The OpenCMISS functional testing framework has been designed to run examples as functional tests. The framework has been written using the CMake scripting language.
+
+For a quick start guide to using the framework you can read the short documentation below.  For more detailed documentation read the full guide available `here <docs/index.rst>`_.
+
 Usage (brief)
 =============
 
