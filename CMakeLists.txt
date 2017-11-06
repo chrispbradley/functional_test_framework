@@ -81,8 +81,8 @@ endif ()
 if (NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/testrunner-build")
     file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/testrunner-build)
 endif ()
-if (NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/CTestTestFile.cmake")
-    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/CTestTestFile.cmake" "# Generated test configuration file.\r\nsubdirs(\"testrunner-build\")\r\n")
+if (NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/CTestTestfile.cmake")
+    file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/CTestTestfile.cmake" "# Generated test configuration file.\r\nsubdirs(\"testrunner-build\")\r\n")
 endif ()
 
 add_custom_target(acquire_tests
