@@ -56,6 +56,8 @@ The *TEST_TOLERANCE* variable, if defined, must specify the relative error allow
 
 The *TEST_MULTI_PROCESS* variable, if defined, specifies whether the example is to be run using multi-processes or not.  The variable must be defined as either *TRUE* or *FALSE*.  This variable applies to all the targets specified in the *TEST_TARGETS* variable.  If the *TEST_MULTI_PROCESS* variable is defined then the *TEST_NP* variable must be defined.  The value of the *TEST_NP* variable is an integer value that represents the number of processes to use when executing the program.
 
+The name of the test is taken from the name of the test description file less the suffix '.cmake'.
+
 How to use
 ==========
 
@@ -69,7 +71,7 @@ To use the framework execute the following commands from a terminal application 
 
 .. note:: The OpenCMISSLibs_DIR should be set with a value which is an actual directory accessible from your machine where the OpenCMISS libraries have been installed.
 
-This will configure, build, and run the test(s) defined by the test database.  You can re-run just the tests (once the intial configure, build, and run has successfully completed) with the `ctest` command::
+This will configure, build, and run the test(s) defined by the default test database.  You can re-run just the tests (once the intial configure, build, and run has successfully completed) with the `ctest` command::
 
    ctest
 
@@ -78,20 +80,24 @@ Framework configuration
 
 The framework must be configured with *OpenCMISSLibs_DIR* set to the location of an OpenCMISS libraries installation install directory.
 
-The *TEST_DB* variable defines the location of the database to use for testing.  The default database is the database retreived by the variables *TEST_DB_REPO_URL* and *TEST_DB_REPO_BRANCH*.  You can set the location of the *TEST_DB* to a local database by passing the variable in through the command line or set it using a CMake-GUI application.
+The framework also provides the following variables that can be configured.
 
-You can also optionally change the default test database with the *TEST_DB_REPO_URL* variable and also set the branch from the test database repository with the *TEST_DB_REPO_BRANCH* variable.  These variables can be passed in through the command line or set using a CMake-GUI application.  The *TEST_DB_REPO_URL* variable can be used to retreive any database that is accessible through Git.
+* *TEST_DB_REPO_URL*: This variable defines a (potentially) remote Git repository.
+* *TEST_DB_REPO_BRANCH*: This variable defines a branch or tag name in the *TEST_DB_REPO_URL* Git repository.
+* *TEST_DB*: This variable defines the location of the database to use for testing.  It always points to somewhere on the local disk.
 
-The *TEST_DB* variable may either point directly to a test description file as defined above or a directory containing test description files.
+The Git repository specified by *TEST_DB_REPO_URL* will be retrieved regardless of whether it is used or not.  This repository is stored on the local disk in an internal framework location.  By default the *TEST_DB* location is set to point at this database.  
 
-If the *TEST_DB* variable is defined and it is a directory or file that exists then this is the database that will be used by the framework and the database defined by the *TEST_DB_REPO_URL* and *TEST_DB_REPO_BRANCH* variables will be ignored.  The *TEST_DB* variable may be used to reference a location on the local disk.  A reference to a location on the local disk must be defined as an absolute path, using a relative path will cause undefined behaviour.
+You can change which test database is retrieved with the *TEST_DB_REPO_URL* variable and also set the branch from the test database repository with the *TEST_DB_REPO_BRANCH* variable.  These variables can be passed in through the command line or set using a CMake-GUI application.  The *TEST_DB_REPO_URL* variable can be used to retreive any database that is accessible through Git.
 
-An example of configuring the framework to use a local database is given below::
+Use the *TEST_DB* variable to define the location of the database to use for testing.  This can be set to any location on the local disk.  It may reference a test description file or a directory containing a set of test description files.  You can set the location of the *TEST_DB* to a database on the local disk by passing the variable in through the command line or set it using a CMake-GUI application.  The *TEST_DB* variable referencing a location on the local disk must be defined as an absolute path, using a relative path will cause undefined behaviour.
+
+An example of configuring the framework to use a database defined by the user outside the functional test framework is given below::
 
     cmake -DOpenCMISSLibs_DIR=/location/where/opencmiss/libraries/are/installed 
-      -DTEST_DB=/absoulte/path/to/test_name.cmake ../functional_test_framework
+      -DTEST_DB=/absolute/path/to/test_name.cmake ../functional_test_framework
 
-Where the file *test_name.cmake* is a valid test description file according to the OpenCMISS test database standard.  In the above example only a single example *test_name* is tested.
+Where the file *test_name.cmake* is a valid test description file according to the OpenCMISS test database standard.  In the above example only a single example *test_name* is tested.  The *TEST_DB* variable references a location outside of the test framework source or build directories.
 
 Test description examples
 =========================
@@ -106,13 +112,13 @@ Below is a basic example of a test description file that meets the requirements 
 
 This example defines a single executable program with the CMake target name *burgers_static_fortran*.  The framework will test that this example builds and executes against the defined OpenCMISS libraries.
 
-Below is an example of a test description file that defines a Python script meets the requirements of the test framework::
+Below is an example of a test description file that defines a Python script that meets the requirements of the test framework::
 
    set(TEST_GIT_REPO https://github.com/OpenCMISS-Examples/nonlinear_poisson_equation.git)
    set(TEST_BRANCH develop)
    set(PYTEST_TARGETS src/python/nonlinear_poisson_equation.py)
 
-Below is an example of running a test that is on the local disk the *\*_GIT_REPO* variable is defined as an absolute path::
+Below is an example of running a test that is on the local disk the *\*_GIT_REPO* variable is defined as an absolute path, it also overrides the default tolerance by specifying the tolerance required for this test::
 
     set(TEST_GIT_REPO /path/to/opencmiss-software/example_framework/examples/diffusion_equation)
     set(TEST_BRANCH develop)
@@ -139,4 +145,4 @@ Below is an example of several executable programs with arguments using multiple
     set(PYTEST_MULTI_PROCESS TRUE)
     set(PYTEST_NP 4)
 
-When the executables have been successfully run the outputs given in the *\*_EXPECTED_RESULTS* variable will be compared against the actual outputs from the program, the test will be marked as a failed test if the outputs do not match to the default tolerance.
+When the executables have been successfully run the outputs given in the *\*_EXPECTED_RESULTS* variable will be compared against the actual outputs from the program, the test will be marked as a failed test if the outputs do not match to the default tolerance (or the tolerance specified in the test description).
