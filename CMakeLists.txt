@@ -43,6 +43,12 @@ else ()
     set(SINGLE_BUILD_CONFIG -DCMAKE_BUILD_TYPE=Release)
 endif ()
 
+if (OPENCMISS_MPI)
+    set(OPENCMISS_MPI_CONFIGURATION -DOPENCMISS_MPI=${OPENCMISS_MPI})
+else ()
+    set(OPENCMISS_MPI_CONFIGURATION -UOPENCMISS_MPI)
+endif ()
+
 # Get ndiff installed.
 set(NDIFF_REPO_URL ${NDIFF_GIT_BASE}/${NDIFF_ORG}/${NDIFF_REPO_NAME})
 set(NDIFF_CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=.)
@@ -97,6 +103,7 @@ add_custom_target(acquire_tests
 
 add_custom_target(setup_tests
     COMMAND ${CMAKE_COMMAND}
+        ${OPENCMISS_MPI_CONFIGURATION}
         -DOpenCMISSLibs_DIR=${OpenCMISSLibs_DIR}
         -DCMAKE_MODULE_PATH=${CMAKE_CURRENT_SOURCE_DIR}/Modules
         -DTEST_DB=${TEST_DB}
