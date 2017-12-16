@@ -24,11 +24,13 @@ if (IS_DIRECTORY "${EXPECTED_OUTPUT}")
     foreach(_file ${expected_files})
         math(EXPR _NDIFF_COUNT "${_NDIFF_COUNT}+1")
         string(REGEX REPLACE "^${EXPECTED_OUTPUT}/" "" _output_file ${_file} )
-        set(NDIFF_COMPARISON_${_NDIFF_COUNT} COMMAND ${NDIFF_EXECUTABLE} -abserr ${TEST_ABS_TOLERANCE} -relerr ${TEST_TOLERANCE} ${_file} ${TEST_OUTPUT}/${_output_file})
+        set(NDIFF_ABS_COMPARISON_${_NDIFF_COUNT} COMMAND ${NDIFF_EXECUTABLE} -abserr ${TEST_ABS_TOLERANCE} ${_file} ${TEST_OUTPUT}/${_output_file})
+        set(NDIFF_REL_COMPARISON_${_NDIFF_COUNT} COMMAND ${NDIFF_EXECUTABLE} -relerr ${TEST_REL_TOLERANCE} ${_file} ${TEST_OUTPUT}/${_output_file})
     endforeach()
 elseif (EXISTS "${EXPECTED_OUTPUT}")
     set(_NDIFF_COUNT 1)
-    set(NDIFF_COMPARISON_1 COMMAND ${NDIFF_EXECUTABLE} -abserr ${TEST_ABS_TOLERANCE} -relerr ${TEST_REL_TOLERANCE} ${EXPECTED_OUTPUT} ${TEST_OUTPUT})
+    set(NDIFF_ABS_COMPARISON_1 COMMAND ${NDIFF_EXECUTABLE} -abserr ${TEST_ABS_TOLERANCE} ${EXPECTED_OUTPUT} ${TEST_OUTPUT})
+    set(NDIFF_REL_COMPARISON_1 COMMAND ${NDIFF_EXECUTABLE} -relerr ${TEST_REL_TOLERANCE} ${EXPECTED_OUTPUT} ${TEST_OUTPUT})
 endif ()
 
 string(REPLACE "|" ";" TEST_CMD ${TEST_CMD})
@@ -51,8 +53,8 @@ else ()
     set(_NDIFF_INDEX 0)
     while(_NDIFF_INDEX LESS _NDIFF_COUNT)
         math(EXPR _NDIFF_INDEX "${_NDIFF_INDEX}+1")
-        list(GET NDIFF_COMPARISON_${_NDIFF_INDEX} 4 _expected_file)
-        list(GET NDIFF_COMPARISON_${_NDIFF_INDEX} 5 _actual_file)
+        list(GET NDIFF_ABS_COMPARISON_${_NDIFF_INDEX} 4 _expected_file)
+        list(GET NDIFF_ABS_COMPARISON_${_NDIFF_INDEX} 5 _actual_file)
 
         if (NOT EXISTS "${_expected_file}")
             message(SEND_ERROR "Expected output: '${_expected_file}' does not exist!")
@@ -62,17 +64,32 @@ else ()
         endif ()
 
         execute_process(
-          ${NDIFF_COMPARISON_${_NDIFF_INDEX}}
-          RESULT_VARIABLE test_not_successful
-          OUTPUT_FILE ${_actual_file}.ndiff
+          ${NDIFF_ABS_COMPARISON_${_NDIFF_INDEX}}
+          RESULT_VARIABLE test_abs_not_successful
+          OUTPUT_FILE ${_actual_file}.abs_ndiff
           ERROR_VARIABLE _ERROR)
 
-        if (test_not_successful)
-            message(SEND_ERROR "Expected output: '${_expected_file}' does not match actual output '${_actual_file}'!")
-        endif ()
-        
         if (_ERROR)
-            message(SEND_ERROR "Test '${TEST_NAME}' reported error: ${_ERROR}")
+            message(SEND_ERROR "Test '${TEST_NAME}' reported abs ndiff error: ${_ERROR}")
         endif ()
+
+	if (test_abs_not_successful)
+	
+           execute_process(
+              ${NDIFF_REL_COMPARISON_${_NDIFF_INDEX}}
+              RESULT_VARIABLE test_rel_not_successful
+              OUTPUT_FILE ${_actual_file}.rel_ndiff
+              ERROR_VARIABLE _ERROR)
+
+           if (_ERROR)
+               message(SEND_ERROR "Test '${TEST_NAME}' reported rel ndiff error: ${_ERROR}")
+           endif ()
+
+	   if (test_rel_not_successful)
+               message(SEND_ERROR "Expected output: '${_expected_file}' does not match actual output '${_actual_file}'!")
+           endif ()        
+	
+	endif()       
+
     endwhile()
 endif ()
