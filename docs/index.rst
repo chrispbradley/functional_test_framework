@@ -47,9 +47,13 @@ The *TEST_EXPECTED_RESULTS* variable, if defined, must specify the location of t
 
 The *TEST_TARGET_ARGS* variable, if defined, must specify the arguments to be passed to the the executable to test.  If the executable requires multiple arguments each argument must be separated with the '|' symbol.  Like the *TEST_EXPECTED_RESULTS* variable the number of entries in the *TEST_TARGET_ARGS* variable must match the number of entries in the *TEST_TARGETS* variable.
 
-* TEST_TOLERANCE
+* TEST_REL_TOLERANCE
 
-The *TEST_TOLERANCE* variable, if defined, must specify the relative error allowed for numerical comparisons in the output.  The default value is `1e-14`.
+The *TEST_REL_TOLERANCE* variable, if defined, must specify the relative error allowed for numerical comparisons in the output.  The default value is `1e-14`.
+
+* TEST_ABS_TOLERANCE
+
+The *TEST_ABS_TOLERANCE* variable, if defined, must specify the absolute error allowed for numerical comparisons in the output.  Note that the relative tolerance is only used if the absolute tolerance test does not pass. The default value is `1.11e-15`.
 
 * TEST_MULTI_PROCESS
 * TEST_NP
@@ -118,13 +122,13 @@ Below is an example of a test description file that defines a Python script that
    set(TEST_BRANCH develop)
    set(PYTEST_TARGETS src/python/nonlinear_poisson_equation.py)
 
-Below is an example of running a test that is on the local disk the *\*_GIT_REPO* variable is defined as an absolute path, it also overrides the default tolerance by specifying the tolerance required for this test::
+Below is an example of running a test that is on the local disk the *\*_GIT_REPO* variable is defined as an absolute path, it also overrides the default relative tolerance by specifying the relative tolerance required for this test::
 
     set(TEST_GIT_REPO /path/to/opencmiss-software/example_framework/examples/diffusion_equation)
     set(TEST_BRANCH develop)
     set(TEST_TARGETS diffusion_equation)
     set(TEST_EXPECTED_RESULTS src/fortran/expected_results/)
-    set(TEST_TOLERANCE 1e-12)
+    set(TEST_REL_TOLERANCE 1e-12)
 
 Below is an example of several executable programs with arguments using multiple processors::
 
@@ -145,4 +149,4 @@ Below is an example of several executable programs with arguments using multiple
     set(PYTEST_MULTI_PROCESS TRUE)
     set(PYTEST_NP 4)
 
-When the executables have been successfully run the outputs given in the *\*_EXPECTED_RESULTS* variable will be compared against the actual outputs from the program, the test will be marked as a failed test if the outputs do not match to the default tolerance (or the tolerance specified in the test description).
+When the executables have been successfully run the outputs given in the *\*_EXPECTED_RESULTS* variable will be compared against the actual outputs from the program, the test will be marked as a failed test if the outputs do not match to the default relative tolerance (or the relative tolerance specified in the test description).
