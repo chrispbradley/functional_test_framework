@@ -66,7 +66,7 @@ else ()
         execute_process(
           ${NDIFF_ABS_COMPARISON_${_NDIFF_INDEX}}
           RESULT_VARIABLE test_abs_not_successful
-          OUTPUT_VARIABLE _OUTPUT
+          OUTPUT_FILE ${_actual_file}.ndiff
           ERROR_VARIABLE _ERROR)
 
         if (_ERROR)
