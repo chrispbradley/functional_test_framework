@@ -41,6 +41,8 @@ execute_process(
     ERROR_VARIABLE _out
     WORKING_DIRECTORY test_runs/${TEST_NAME})
 
+file(WRITE test_runs/${TEST_NAME}/${TEST_NAME}.ctest_out ${_out})
+
 if (test_execution_not_successful)
     message(STATUS "test_execution_not_successful: ${test_execution_not_successful}")
     message(STATUS "_out: ${_out}")
