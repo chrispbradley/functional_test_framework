@@ -20,16 +20,19 @@ macro(write_mp_python_test OUTPUT_FILENAME TEST_NAME TEST_TARGET TEST_NP TEST_RO
 endmacro()
 
 function(_write_test_to_file OUTPUT_FILENAME TEST_NAME TEST_CMD TEST_ROOT TEST_EXPECTED_RESULTS TEST_ABS_TOLERANCE TEST_REL_TOLERANCE)
-    set(CONFIGURED_INPUTS)
     foreach(_arg ${ARGN})
-        set(TEST_CMD "${TEST_CMD}|${_arg}")
-        if (EXISTS "${TEST_ROOT}/${_arg}")
-            list(APPEND CONFIGURED_INPUTS "configure_file(${TEST_ROOT}/${_arg} \${CMAKE_BINARY_DIR}/test_runs/${TEST_NAME}/${_arg})\n")
-        endif ()
+        string(REPLACE "|" ";" _args_list ${_arg})
+        set(_extended_args)
+        foreach(_arg_in ${_args_list})
+            if (EXISTS "${TEST_ROOT}/${_arg_in}")
+                list(APPEND _extended_args "${TEST_ROOT}/${_arg_in}")
+            else ()
+                list(APPEND _extended_args ${_arg_in})
+            endif ()
+        endforeach()
+        string(REPLACE ";" "|" _extended_args "${_extended_args}")
+        set(TEST_CMD "${TEST_CMD}|${_extended_args}")
     endforeach()
-    if (CONFIGURED_INPUTS)
-        list(REMOVE_DUPLICATES CONFIGURED_INPUTS)
-    endif ()
     if (TEST_EXPECTED_RESULTS AND NOT TEST_EXPECTED_RESULTS STREQUAL "NOTFOUND")
         set(EXPECTED_OUTPUT_ARGUMENT -DEXPECTED_OUTPUT=${TEST_ROOT}/${TEST_EXPECTED_RESULTS})
     endif ()
@@ -37,9 +40,6 @@ function(_write_test_to_file OUTPUT_FILENAME TEST_NAME TEST_CMD TEST_ROOT TEST_E
     set(_TMP_OUTPUT "
 # Create output directory
 file(MAKE_DIRECTORY \${CMAKE_BINARY_DIR}/test_runs/${TEST_NAME})
-
-# Configure input files (if required).
-${CONFIGURED_INPUTS}
 
 add_test(NAME ${TEST_NAME}
    COMMAND ${CMAKE_COMMAND}
