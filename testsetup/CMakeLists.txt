@@ -65,7 +65,7 @@ while(TEST_INDEX LESS TEST_COUNT)
         set(_current_args_list ${${_prefix}${TEST_INDEX}_TARGETS_ARGS})
         set(_current_mp ${${_prefix}${TEST_INDEX}_MULTI_PROCESS})
         if (_current_mp)
-            set(_current_np ${TEST_${TEST_INDEX}_NP})
+            set(_current_np ${${_prefix}${TEST_INDEX}_NP})
         endif ()
 
         if (_current_targets)
